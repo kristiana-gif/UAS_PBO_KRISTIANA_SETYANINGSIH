@@ -1,9 +1,12 @@
 <?php
 // =============================================
-// FILE: slip_gaji.php
+// FILE: index.php
 // UAS PBO - TRPL1B - KRISTIANA SETYANINGSIH
 // IMPLEMENTASI VIEW - SLIP GAJI KARYAWAN
 // =============================================
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 require_once 'koneksi.php';
 require_once 'KaryawanKontrak.php';
@@ -81,7 +84,7 @@ if ($detailId) {
     }
 }
 
-// Ambil statistik
+// Ambil statistik (dengan koneksi yang sama, belum ditutup)
 $statsQuery = "SELECT 
     jenis_karyawan, 
     COUNT(*) as jumlah,
@@ -90,9 +93,16 @@ $statsQuery = "SELECT
     GROUP BY jenis_karyawan";
 $statsResult = $conn->query($statsQuery);
 
-$db->closeConnection();
-?>
+// Ambil total karyawan
+$totalQuery = "SELECT COUNT(*) as total FROM tabel_karyawan";
+$totalResult = $conn->query($totalQuery);
+$total = $totalResult->fetch_assoc()['total'];
 
+// =============================================
+// CATATAN: KONEKSI BELUM DITUTUP DI SINI
+// KONEKSI AKAN DITUTUP DI PALING AKHIR FILE
+// =============================================
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -633,15 +643,11 @@ $db->closeConnection();
         <!-- STATISTIK -->
         <div class="stats-grid">
             <div class="stat-card total">
-                <div class="number"><?php 
-                    $totalQuery = "SELECT COUNT(*) as total FROM tabel_karyawan";
-                    $totalResult = $conn->query($totalQuery);
-                    $total = $totalResult->fetch_assoc()['total'];
-                    echo $total;
-                ?></div>
+                <div class="number"><?= $total ?></div>
                 <div class="label">Total Karyawan</div>
             </div>
             <?php 
+            // Reset pointer hasil query statistik
             $statsResult->data_seek(0);
             while($stat = $statsResult->fetch_assoc()): 
             ?>
@@ -911,5 +917,13 @@ $db->closeConnection();
             <p style="font-size:11px; margin-top:5px;">Sistem Slip Gaji Berbasis OOP - Implementasi Abstract Class, Inheritance, & Polymorphism</p>
         </div>
     </div>
+    
+    <?php
+    // =============================================
+    // TUTUP KONEKSI DATABASE DI PALING AKHIR
+    // =============================================
+    $db->closeConnection();
+    ?>
+    
 </body>
 </html>
