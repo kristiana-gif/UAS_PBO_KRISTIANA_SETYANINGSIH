@@ -2,6 +2,7 @@
 // =============================================
 // FILE: KaryawanTetap.php
 // CLASS: KaryawanTetap (Child dari Karyawan)
+// IMPLEMENTASI POLIMORFISME - OVERRIDING
 // =============================================
 
 require_once 'koneksi.php';
@@ -37,20 +38,23 @@ class KaryawanTetap extends Karyawan {
         $this->opsiSahamId = $opsiSahamId;
     }
     
-    // Implementasi method abstrak hitungGajiBersih()
+    /**
+     * METHOD OVERRIDING - hitungGajiBersih()
+     * POLIMORFISME: Karyawan Tetap
+     * Logika: Gaji Bersih = (hariKerjaMasuk * gajiDasarPerHari) + tunjanganKesehatan
+     * (Mendapatkan tambahan tunjangan kesehatan/keluarga yang besarnya bervariasi)
+     */
     public function hitungGajiBersih() {
-        $gajiKotor = $this->hitungGajiKotor();
-        // Karyawan tetap mendapat tunjangan kesehatan
-        $gajiSetelahTunjangan = $gajiKotor + $this->tunjanganKesehatan;
-        // Pajak 5% (lebih tinggi karena tetap)
-        $pajak = $gajiKotor * 0.05;
-        $gajiBersih = $gajiSetelahTunjangan - $pajak;
+        // Menggunakan method hitungMasaKerja() dari parent
+        $hariKerja = $this->hitungMasaKerja();
+        $gajiPokok = $hariKerja * $this->getGajiDasarPerHari();
+        $gajiBersih = $gajiPokok + $this->tunjanganKesehatan;
         return $gajiBersih;
     }
     
     // Implementasi method abstrak tampilkanProfilKaryawan()
     public function tampilkanProfilKaryawan() {
-        echo "<div style='border:1px solid #2ecc71; padding:15px; margin:10px; border-radius:5px;'>";
+        echo "<div style='border:1px solid #2ecc71; padding:15px; margin:10px; border-radius:5px; background:#f0fff4;'>";
         echo "<h3 style='color:#2ecc71;'>📋 PROFIL KARYAWAN TETAP</h3>";
         echo "<hr>";
         echo "<table style='width:100%;'>";
@@ -61,9 +65,10 @@ class KaryawanTetap extends Karyawan {
         echo "<tr><td><strong>Gaji Dasar/Hari</strong></td><td>: Rp " . number_format($this->getGajiDasarPerHari(), 0, ',', '.') . "</td></tr>";
         echo "<tr><td><strong>Tunjangan Kesehatan</strong></td><td>: Rp " . number_format($this->tunjanganKesehatan, 0, ',', '.') . "</td></tr>";
         echo "<tr><td><strong>Opsi Saham ID</strong></td><td>: " . $this->opsiSahamId . "</td></tr>";
-        echo "<tr><td><strong>Gaji Kotor/Bulan</strong></td><td>: Rp " . number_format($this->hitungGajiKotor(), 0, ',', '.') . "</td></tr>";
-        echo "<tr><td><strong>Gaji Bersih/Bulan</strong></td><td>: Rp " . number_format($this->hitungGajiBersih(), 0, ',', '.') . "</td></tr>";
-        echo "<tr><td><strong>Masa Kerja</strong></td><td>: " . $this->hitungMasaKerja() . " hari</td></tr>";
+        echo "<tr><td><strong>Hari Kerja</strong></td><td>: " . $this->hitungMasaKerja() . " hari</td></tr>";
+        echo "<tr><td><strong>Gaji Pokok</strong></td><td>: Rp " . number_format($this->hitungMasaKerja() * $this->getGajiDasarPerHari(), 0, ',', '.') . "</td></tr>";
+        echo "<tr><td style='font-weight:bold;color:#2ecc71;'>💵 Gaji Bersih</strong></td><td style='font-weight:bold;color:#2ecc71;'>: Rp " . number_format($this->hitungGajiBersih(), 0, ',', '.') . "</td></tr>";
+        echo "<tr><td><strong>Keterangan</strong></td><td>: <em>Gaji pokok + tunjangan kesehatan</em></td></tr>";
         echo "</table>";
         echo "</div>";
     }
